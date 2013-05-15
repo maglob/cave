@@ -14,15 +14,12 @@ window.onkeydown = window.onkeyup = function (e) {
     }
 }
 
-
 function tick() {
-    if (frame == 0)
-	console.log(document.getElementById("svg").style)
     frame++
     if (ship.controls.left)
-	ship.a -= 6;
+	ship.a -= 6
     if (ship.controls.right)
-	ship.a += 6;
+	ship.a += 6
     if (ship.controls.thrust) {
 	ship.vx += Math.cos(Math.PI/180*ship.a)*.5
 	ship.vy += Math.sin(Math.PI/180*ship.a)*.5
@@ -31,8 +28,8 @@ function tick() {
     ship.x += ship.vx
     ship.y += ship.vy
     var view = document.getElementById("view")
-    document.getElementById("ship").setAttribute("transform", "translate("+ view.clientWidth/2 +","+ view.clientHeight/2 +") rotate("+ ship.a +")"); 
-    document.getElementById("cave").setAttribute("transform", "translate("+ -ship.x +","+ -ship.y +")"); 
+    document.getElementById("ship").setAttribute("transform", "translate("+ view.clientWidth/2 +","+ view.clientHeight/2 +") rotate("+ ship.a +")")
+    document.getElementById("cave").setAttribute("transform", "translate("+ -ship.x +","+ -ship.y +")")
     setTimeout(tick, 50)
 }
 
