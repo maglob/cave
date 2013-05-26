@@ -20,9 +20,25 @@ function set(elementIdDotAttribute, value) {
   return document.getElementById(a[0]).setAttribute(a[1], value)
 }
 
+Array.prototype.scale = function(scale) {
+  if (typeof scale == 'number')
+    scale = [scale]
+  for (r=[],i=0; i<this.length; i++) 
+    r.push(this[i] * scale[i % scale.length])
+  return r
+}
+
+Array.prototype.add = function(b) {
+  if (typeof b == 'number')
+    b = [b]
+  for (r=[],i=0; i<this.length; i++) 
+    r.push(this[i] + b[i % b.length])
+  return r
+}
+
 function init() {
-  set('ship.points', '20,0 -15,-12 -8,-3 -8,4 -15,12')
-  set('cave.points', '0,0 50,300 100,280 150,250 200,200 300,100 400,100 500,250 600,400 800,300')
+  set('ship.points', [20,0, -15,-12, -8,-3, -8,4, -15,12])
+  set('cave.points', [0,0, 50,300, 100,280, 150,250, 200,200, 300,100, 400,100, 500,250, 600,400, 800,300])
   set('shield.r', 26)
   tick()
 }
