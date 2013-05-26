@@ -3,7 +3,7 @@
 <title>Cave</title>
 <script>
 frame=0
-ship={x:100, y:-200, a:-90, vx:0, vy:0, controls: {left: false, right: false, thrust: false, shield: false}}
+ship={x:0, y:-0, a:90, vx:0, vy:0, controls: {left: false, right: false, thrust: false, shield: false}}
 
 window.onkeydown = window.onkeyup = function (e) {
   var isDown = e.type == "keydown"
@@ -22,7 +22,7 @@ function set(elementIdDotAttribute, value) {
 
 function init() {
   set('ship.points', '20,0 -15,-12 -8,-3 -8,4 -15,12')
-  set('cave.points', '0,200 50,300 100,280 150,250 200,200 300,100 400,100 500,250 600,400 800,300')
+  set('cave.points', '0,0 50,300 100,280 150,250 200,200 300,100 400,100 500,250 600,400 800,300')
   set('shield.r', 26)
   tick()
 }
@@ -30,22 +30,22 @@ function init() {
 function tick() {
   frame++
   if (ship.controls.left)
-    ship.a -= 6
-  if (ship.controls.right)
     ship.a += 6
+  if (ship.controls.right)
+    ship.a -= 6
   if (ship.controls.thrust) {
     ship.vx += Math.cos(Math.PI/180*ship.a)*.5
     ship.vy += Math.sin(Math.PI/180*ship.a)*.5
   }
-  ship.vy += 0.02
+  ship.vy -= 0.02
   ship.x += ship.vx
   ship.y += ship.vy
   var view = document.getElementById("view")
-  set('ship.transform', 'translate('+ view.clientWidth/2 +','+ view.clientHeight/2 +') rotate('+ ship.a +')')
-  set('cave.transform', 'translate('+ -ship.x +','+ -ship.y +')')
+  set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.x) +','+  (-view.clientHeight/2-ship.y) +')')
+  set('ship.transform', 'translate('+ ship.x +','+ ship.y +') rotate('+ ship.a +')')
   set('shield.visibility', ship.controls.shield ? 'visible' : 'hidden')
   if (ship.controls.shield) {
-    set('shield.transform', 'translate('+ view.clientWidth/2 +','+ view.clientHeight/2 +')')
+    set('shield.transform', 'translate('+ ship.x +','+ ship.y +')')
     set('shield.stroke-dashoffset', frame*2)
   }
   setTimeout(tick, 50)
@@ -55,11 +55,17 @@ function tick() {
 </script>
 </head>
 <body style="background-color: black" onLoad="init()">
-<div id="view"><svg id="svg" width="99%" height="99%">
-<polyline id="cave" fill="none" stroke="white"/>
-  <polygon id="ship" stroke="white"/>
-  <circle id="shield" fill-opacity="0" stroke="white" stroke-dasharray="4 6"/>
-  <text x="10" y="15" stroke="white">A: turn left, D: turn right, L: thrust, Space: shield</text>
-</svg></div>
+<div id="view">
+  <svg id="svg" width="99%" height="99%">
+    <g id="viewport">
+      <polyline id="cave" fill="none" stroke="white"/>
+      <polygon id="ship" stroke="white"/>
+      <circle id="shield" fill-opacity="0" stroke="white" stroke-dasharray="4 6"/>
+    </g>
+    <g id="console">
+      <text x="10" y="15" stroke="white">A: turn left, D: turn right, L: thrust, Space: shield</text>
+    </g>
+  </svg>
+</div>
 </body>
 </html>
