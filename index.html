@@ -36,11 +36,20 @@ Array.prototype.add = function(b) {
   return r
 }
 
+
 Array.prototype.sub = function(b) {
   if (typeof b == 'number')
     b = [b]
   for (var r=[],i=0; i<this.length; i++) 
     r.push(this[i] - b[i % b.length])
+  return r
+}
+
+Array.prototype.rotate = function(angle) {
+  for (var r=[],i=0; i<this.length; i+=2) {
+    r.push(this[i]*Math.cos(angle) - this[i+1]*Math.sin(angle))
+    r.push(this[i]*Math.sin(angle) + this[i+1]*Math.cos(angle))
+  }
   return r
 }
 
@@ -61,9 +70,18 @@ Array.prototype.normal = function(b) {
   return [-r[1], r[0]].unit()
 }
 
+function createRegularPolygon(n) {
+  for(var r=[],i=0; i<n; i++) {
+    var a = Math.PI * 2 / n * i;
+    r.push(Math.cos(a))
+    r.push(Math.sin(a))
+  }
+  return r
+}
+
 function init() {
   set('ship.points', [20,0, -15,-12, -8,-3, -8,4, -15,12])
-  set('cave.points', [0,0, 50,300, 100,280, 150,250, 200,200, 300,100, 400,100, 500,250, 600,400, 800,300])
+  set('cave.points', createRegularPolygon(6).scale([600, 300]).rotate(Math.PI/16))
   set('shield.r', 26)
   tick()
 }
@@ -99,7 +117,7 @@ function tick() {
 <div id="view">
   <svg id="svg" width="99%" height="99%">
     <g id="viewport">
-      <polyline id="cave" fill="none" stroke="white"/>
+      <polygon id="cave" fill="none" stroke="white"/>
       <polygon id="ship" stroke="white"/>
       <circle id="shield" fill-opacity="0" stroke="white" stroke-dasharray="4 6"/>
     </g>
