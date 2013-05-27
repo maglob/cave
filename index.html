@@ -23,7 +23,7 @@ function set(elementIdDotAttribute, value) {
 Array.prototype.scale = function(scale) {
   if (typeof scale == 'number')
     scale = [scale]
-  for (r=[],i=0; i<this.length; i++) 
+  for (var r=[],i=0; i<this.length; i++) 
     r.push(this[i] * scale[i % scale.length])
   return r
 }
@@ -31,9 +31,34 @@ Array.prototype.scale = function(scale) {
 Array.prototype.add = function(b) {
   if (typeof b == 'number')
     b = [b]
-  for (r=[],i=0; i<this.length; i++) 
+  for (var r=[],i=0; i<this.length; i++) 
     r.push(this[i] + b[i % b.length])
   return r
+}
+
+Array.prototype.sub = function(b) {
+  if (typeof b == 'number')
+    b = [b]
+  for (var r=[],i=0; i<this.length; i++) 
+    r.push(this[i] - b[i % b.length])
+  return r
+}
+
+Array.prototype.len = function() {
+  return Math.sqrt(this[0]*this[0]+this[1]*this[1])
+}
+
+Array.prototype.unit = function() {
+  return this.scale(1.0 / this.len())
+}
+
+Array.prototype.dot = function(b) {
+  return this[0]*b[0] + this[1]*b[1];
+}
+
+Array.prototype.normal = function(b) {
+  var r = b.sub(this)
+  return [-r[1], r[0]].unit()
 }
 
 function init() {
