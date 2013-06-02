@@ -46,10 +46,9 @@ Array.prototype.sub = function(b) {
 }
 
 Array.prototype.rotate = function(angle) {
-  for (var r=[],i=0; i<this.length; i+=2) {
-    r.push(this[i]*Math.cos(angle) - this[i+1]*Math.sin(angle))
-    r.push(this[i]*Math.sin(angle) + this[i+1]*Math.cos(angle))
-  }
+  for (var r=[],i=0; i<this.length; i+=2) 
+    r.push(this[i]*Math.cos(angle) - this[i+1]*Math.sin(angle),
+	   (this[i]*Math.sin(angle) + this[i+1]*Math.cos(angle)))
   return r
 }
 
@@ -70,11 +69,11 @@ Array.prototype.normal = function(b) {
   return [-r[1], r[0]].unit()
 }
 
+
 function createRegularPolygon(n) {
   for(var r=[],i=0; i<n; i++) {
     var a = Math.PI * 2 / n * i;
-    r.push(Math.cos(a))
-    r.push(Math.sin(a))
+    r.push(Math.cos(a), Math.sin(a))
   }
   return r
 }
