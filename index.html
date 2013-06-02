@@ -78,6 +78,24 @@ function createRegularPolygon(n) {
   return r
 }
 
+// Repeat next method in chain n times
+//   Example: [1,2,3].repeatNext(5).add(1) --> [6,7,8]
+Array.prototype.repeatNext = function(n) {
+  var proxy = {}
+  var _this = this
+  for(var i in this) 
+    if (typeof(this[i]) == 'function' && !this.hasOwnProperty(i)) 
+      proxy[i] = function(fn) {
+        return function() {
+          var res = _this;
+          for(j=0; j<n; j++) 
+            res = this[fn].apply(res, arguments)
+          return res          
+        };
+      }(i);
+  return proxy
+}
+
 function init() {
   set('ship.points', [20,0, -15,-12, -8,-3, -8,4, -15,12])
   set('cave.points', createRegularPolygon(6).scale([600, 300]).rotate(Math.PI/16))
