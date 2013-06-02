@@ -78,6 +78,24 @@ function createRegularPolygon(n) {
   return r
 }
 
+Array.prototype.midpointDisplacement = function() {
+  if (this.length >= 4) {
+    var r = []
+    for(i=0; i<=this.length-4; i+=2) {
+      var a = this.slice(i, i+2)
+      var b = this.slice(i+2, i+4)
+      r.push(a[0], a[1])
+      var n = a.normal(b)   
+      var mp = a.add(b).scale(0.5)
+      var len = b.sub(a).len() * 0.2
+      var t = mp.add(n.scale(len-Math.random()*len*2))
+      r.push(t[0], t[1])
+    }
+    r.push(this[i], this[i+1])
+    return r
+  }
+}
+
 // Repeat next method in chain n times
 //   Example: [1,2,3].repeatNext(5).add(1) --> [6,7,8]
 Array.prototype.repeatNext = function(n) {
@@ -98,7 +116,7 @@ Array.prototype.repeatNext = function(n) {
 
 function init() {
   set('ship.points', [20,0, -15,-12, -8,-3, -8,4, -15,12])
-  set('cave.points', createRegularPolygon(6).scale([600, 300]).rotate(Math.PI/16))
+  set('cave.points', createRegularPolygon(6).scale([600, 300]).rotate(Math.PI/16).repeatNext(3).midpointDisplacement())
   set('shield.r', 26)
   tick()
 }
