@@ -1,14 +1,25 @@
 
-frame=0
-ship={x:0, y:-0, a:90, vx:0, vy:0, controls: {left: false, right: false, thrust: false, shield: false}}
+frame = 0
+ship = {
+  x:0, y:-0, a:90, 
+  vx:0, vy:0, 
+  controls: {
+    left: false, right: false, thrust: false, shield: false, fire: false
+  }
+}
+
+bullets = []
 
 window.onkeydown = window.onkeyup = function (e) {
   var isDown = e.type == "keydown"
   switch(e.keyCode) {
+  case e.DOM_VK_B:
   case 65: ship.controls.left = isDown; break;
   case 68: ship.controls.right = isDown; break;
+  case 16: // Shift
   case 76: ship.controls.thrust = isDown; break;
   case 32: ship.controls.shield = isDown; break;
+  case 13: ship.controls.fire = isDown; break; // Enter
   }
 }
 
@@ -35,9 +46,36 @@ function tick() {
     ship.vx += Math.cos(Math.PI/180*ship.a)*.5
     ship.vy += Math.sin(Math.PI/180*ship.a)*.5
   }
+  if (ship.controls.fire) {
+    bullets.push({
+      x: ship.x,
+      y: ship.y,
+      vx: ship.vx + Math.cos(Math.PI/180*ship.a)*10,
+      vy: ship.vy + Math.sin(Math.PI/180*ship.a)*10,
+    })
+    ship.controls.fire = false
+  }
   ship.vy -= 0.02
   ship.x += ship.vx
   ship.y += ship.vy
+  for(var i=0; i<bullets.length; i++) {
+    var b = bullets[i]
+    b.x += b.vx
+    b.y += b.vy
+  }
+
+  for(var i=0; i<bullets.length; i++) {
+    var b = bullets[i]
+    if (!b.dom) {
+      b.dom = document.getElementById("bullets").appendChild(
+        document.createElementNS("http://www.w3.org/2000/svg", "circle"))
+      b.dom.setAttribute("r", 1)
+      b.dom.setAttribute("stroke", "white")
+    }
+    b.dom.setAttribute("cx", b.x)
+    b.dom.setAttribute("cy", b.y)
+  }
+
   var view = document.getElementById("view")
   set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.x) +','+  (-view.clientHeight/2-ship.y) +')')
   set('ship.transform', 'translate('+ ship.x +','+ ship.y +') rotate('+ ship.a +')')
