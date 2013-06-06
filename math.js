@@ -1,25 +1,35 @@
-Array.prototype.scale = function(scale) {
+Array.prototype.scale = function(scale, result) {
   if (typeof scale == 'number')
     scale = [scale]
-  for (var r=[],i=0; i<this.length; i++) 
-    r.push(this[i] * scale[i % scale.length])
-  return r
+  if (typeof(result) === 'undefined') {
+    for (var r=[],i=0; i<this.length; i++) 
+      r.push(this[i] * scale[i % scale.length])
+    return r
+  } else {
+    for (i=0; i<this.length; i++) 
+      result[i] *= scale[i % scale.length]
+    return result
+  }
 }
 
-Array.prototype.add = function(b) {
+Array.prototype.add = function(b, result) {
   if (typeof b == 'number')
     b = [b]
-  for (var r=[],i=0; i<this.length; i++) 
-    r.push(this[i] + b[i % b.length])
-  return r
+  if(typeof(result) === 'undefined') {
+    for (var r=[],i=0; i<this.length; i++) 
+      r.push(this[i] + b[i % b.length])
+    return r
+  } else {
+    for (i=0; i<this.length; i++) 
+      result[i] = this[i] + b[i % b.length]
+    return result
+  }
 }
 
-Array.prototype.sub = function(b) {
-  if (typeof b == 'number')
+Array.prototype.sub = function(b, result) {
+  if (typeof(b) === 'number')
     b = [b]
-  for (var r=[],i=0; i<this.length; i++) 
-    r.push(this[i] - b[i % b.length])
-  return r
+  return this.add(b.scale(-1), result)
 }
 
 Array.prototype.rotate = function(angle) {
@@ -88,4 +98,8 @@ function createRegularPolygon(n) {
     r.push(Math.cos(a), Math.sin(a))
   }
   return r
+}
+
+function createNormal(angle) {
+  return [ Math.cos(Math.PI/180*angle), Math.sin(Math.PI/180*angle) ]
 }

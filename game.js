@@ -1,13 +1,12 @@
 
 frame = 0
 ship = {
-  x:0, y:-0, a:90, 
-  vx:0, vy:0, 
-  controls: {
-    left: false, right: false, thrust: false, shield: false, fire: false
-  }
+  pos: [0, 0], 
+  v: [0, 0],
+  a: 90,  
+  controls: {}
 }
-
+gravity = [0, -0.02]
 bullets = []
 
 window.onkeydown = window.onkeyup = function (e) {
@@ -42,26 +41,20 @@ function tick() {
     ship.a += 6
   if (ship.controls.right)
     ship.a -= 6
-  if (ship.controls.thrust) {
-    ship.vx += Math.cos(Math.PI/180*ship.a)*.5
-    ship.vy += Math.sin(Math.PI/180*ship.a)*.5
-  }
+  if (ship.controls.thrust) 
+    ship.v.add(createNormal(ship.a).scale(.5), ship.v)
   if (ship.controls.fire) {
     bullets.push({
-      x: ship.x,
-      y: ship.y,
-      vx: ship.vx + Math.cos(Math.PI/180*ship.a)*10,
-      vy: ship.vy + Math.sin(Math.PI/180*ship.a)*10,
+      pos: ship.pos.add(0),
+      v: ship.v.add(createNormal(ship.a).scale(10))
     })
     ship.controls.fire = false
   }
-  ship.vy -= 0.02
-  ship.x += ship.vx
-  ship.y += ship.vy
+  ship.v.add(gravity, ship.v)
+  ship.pos = ship.pos.add(ship.v)
   for(var i=0; i<bullets.length; i++) {
     var b = bullets[i]
-    b.x += b.vx
-    b.y += b.vy
+    b.pos.add(b.v, b.pos)
   }
 
   for(var i=0; i<bullets.length; i++) {
@@ -72,16 +65,16 @@ function tick() {
       b.dom.setAttribute("r", 1)
       b.dom.setAttribute("stroke", "white")
     }
-    b.dom.setAttribute("cx", b.x)
-    b.dom.setAttribute("cy", b.y)
+    b.dom.setAttribute("cx", b.pos[0])
+    b.dom.setAttribute("cy", b.pos[1])
   }
 
   var view = document.getElementById("view")
-  set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.x) +','+  (-view.clientHeight/2-ship.y) +')')
-  set('ship.transform', 'translate('+ ship.x +','+ ship.y +') rotate('+ ship.a +')')
+  set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.pos[0]) +','+  (-view.clientHeight/2-ship.pos[1]) +')')
+  set('ship.transform', 'translate('+ ship.pos[0] +','+ ship.pos[1] +') rotate('+ ship.a +')')
   set('shield.visibility', ship.controls.shield ? 'visible' : 'hidden')
   if (ship.controls.shield) {
-    set('shield.transform', 'translate('+ ship.x +','+ ship.y +')')
+    set('shield.transform', 'translate('+ ship.pos[0] +','+ ship.pos[1] +')')
     set('shield.stroke-dashoffset', frame*2)
   }
   setTimeout(tick, 50)
