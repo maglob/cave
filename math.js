@@ -92,6 +92,14 @@ Array.prototype.repeatNext = function(n) {
   return proxy
 }
 
+Array.prototype.distance = function(line) {
+  var a = line.slice(0, 2)
+  var b = line.slice(2, 4)
+  var ln = b.sub(a).unit()
+  var p = a.add(ln.scale(ln.dot(this.sub(a))))
+  return a.normal(b).dot(p.sub(this))
+}
+
 function createRegularPolygon(n) {
   for(var r=[],i=0; i<n; i++) {
     var a = Math.PI * 2 / n * i;

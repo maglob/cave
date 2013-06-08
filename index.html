@@ -4,18 +4,18 @@
 <script src="math.js"></script>
 <script src="game.js"></script>
 </head>
-<body style="background-color: black" onLoad="init()">
+<body style="background-color: #1f661c" onLoad="init()">
 <div id="view">
   <svg id="svg" width="99%" height="99%">
     <g id="viewport">
-      <polygon id="cave" fill="none" stroke="white"/>
-      <polygon id="ship" stroke="white"/>
-      <circle id="shield" fill-opacity="0" stroke="white"  stroke-dasharray="4 6"/> 
+      <polygon id="cave" fill="black" stroke="white"/>
       <g id="bullets"/>
+      <polygon id="ship" stroke="white" fill="darkblue"/>
+      <circle id="shield" fill-opacity="0" stroke="white"  stroke-dasharray="4 6"/> 
     </g>
     <g id="console">
-      <text x="10" y="15" stroke="white">A: turn left,  D: turn right,
-      L or Shfit: thrust, Space: shield, Enter: fire</text>
+      <text x="10" y="15" stroke="lightgray">A: turn left,  D: turn right,
+      Shfit: thrust, Space: shield, Enter: fire, P: pause</text>
     </g>
   </svg>
 </div>
