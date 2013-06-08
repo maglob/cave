@@ -96,8 +96,11 @@ Array.prototype.distance = function(line) {
   var a = line.slice(0, 2)
   var b = line.slice(2, 4)
   var ln = b.sub(a).unit()
-  var p = a.add(ln.scale(ln.dot(this.sub(a))))
-  return a.normal(b).dot(p.sub(this))
+  var x = ln.dot(this.sub(a))
+  if (x>=0 && x<b.sub(a).len()) {
+    var p = a.add(ln.scale(x))
+    return a.normal(b).dot(this.sub(p))
+  }
 }
 
 function createRegularPolygon(n) {

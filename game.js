@@ -14,13 +14,10 @@ var isPause = false
 
 window.onkeydown = window.onkeyup = function (e) {
   var isDown = e.type == "keydown"
-  if (isDown)
-    console.log("key: "+ e.keyCode)
   switch(e.keyCode) {
   case 65: ship.controls.left = isDown; break;
   case 68: ship.controls.right = isDown; break;
-  case 16: // Shift
-  case 76: ship.controls.thrust = isDown; break;
+  case 16: ship.controls.thrust = isDown; break; // Shift
   case 32: ship.controls.shield = isDown; break;
   case 13: ship.controls.fire = isDown; break; // Enter
   case 80: isDown && (isPause = !isPause); break;
@@ -37,6 +34,8 @@ function init() {
   set('ship.points', shipPoints)
   set('cave.points', cavePoints)
   set('shield.r', 26)
+  set('msg.x', 10)
+  set('msg.y', view.clientHeight-4)
   tick()
 }
 
@@ -57,16 +56,19 @@ function updateWorld() {
   for(var i=0; i<bullets.length; i++) {
     var b = bullets[i]
     b.pos.add(b.v, b.pos)
-    /* for(var j=0; j<=cavePoints.length-4; j+=2) {
+    for(var j=0; j<=cavePoints.length-4; j+=2) {
       var l = cavePoints.slice(j, j+4)
       var d = b.pos.distance(l)
-      if(d<0 && d>-10) 
+      if(d && d<0 && d>-20) 
         b.collision = true
-    } */
+    }
   }
   for(var i=0; i<bullets.length; i++)
-    if(bullets[i].collision)
+    if(bullets[i].collision) {
+      bullets[i].dom.parentNode.removeChild(bullets[i].dom)
       bullets.splice(i--, 1)
+    }
+      
 }
 
 function renderView() {
@@ -92,6 +94,8 @@ function renderView() {
     set('shield.transform', 'translate('+ p[0] +','+ p[1] +')')
     set('shield.stroke-dashoffset', frame*2)
   }
+  
+  document.getElementById("msg").firstChild.data = "Frame: " + frame +" Bullets: "+ bullets.length
 }
 
 function tick() {
