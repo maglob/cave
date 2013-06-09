@@ -62,17 +62,9 @@ function updateWorld() {
   for(var i=0; i<bullets.length; i++) {
     var b = bullets[i]
     b.pos.add(b.v, b.pos)
-    /* for(var j=0; j<=cavePoints.length-4; j+=2) {
-      var l = cavePoints.slice(j, j+4)
-      var d = b.pos.distance(l)
-      if(d && d<0 && d>-20) 
-        b.collision = true
-    } */
     for(var j=0; j<caveLines.length; j++) {
-      var l = caveLines[j]
-      var d = l.distance(b.pos)
-      if(d && d<0 && d>-20) 
-        b.collision = true
+      var d = caveLines[j].distance(b.pos)
+      b.collision |= d && d<0 && d>-20
     }
   }
   for(var i=0; i<bullets.length; i++)
