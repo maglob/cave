@@ -91,6 +91,22 @@ Array.prototype.repeatNext = function(n) {
   return proxy
 }
 
+Array.prototype.max = function() {
+  return Math.max.apply(this, this)
+}
+
+Array.prototype.min = function() {
+  return Math.min.apply(this, this)
+}
+
+Array.prototype.odd = function() {
+  return this.filter(function (v,k) {return k%2 == 1 })
+}
+
+Array.prototype.even = function() {
+  return this.filter(function (v,k) {return k%2 == 0 })
+}
+
 function createRegularPolygon(n) {
   for(var r=[],i=0; i<n; i++) {
     var a = Math.PI * 2 / n * i;
