@@ -92,17 +92,6 @@ Array.prototype.repeatNext = function(n) {
   return proxy
 }
 
-Array.prototype.distance = function(line) {
-  var a = line.slice(0, 2)
-  var b = line.slice(2, 4)
-  var ln = b.sub(a).unit()
-  var x = ln.dot(this.sub(a))
-  if (x>=0 && x<b.sub(a).len()) {
-    var p = a.add(ln.scale(x))
-    return a.normal(b).dot(this.sub(p))
-  }
-}
-
 function createRegularPolygon(n) {
   for(var r=[],i=0; i<n; i++) {
     var a = Math.PI * 2 / n * i;
@@ -113,4 +102,37 @@ function createRegularPolygon(n) {
 
 function createNormal(angle) {
   return [ Math.cos(Math.PI/180*angle), Math.sin(Math.PI/180*angle) ]
+}
+
+function Line(a, b) {
+  this.a = a.slice()
+  this.b = b.slice()
+  this.v = b.sub(a)
+  this.unit = this.v.unit()
+  this.normal = a.normal(b)
+  this.length = this.v.len()
+  this.midpoint = a.add(this.v.scale(0.5))
+}
+
+Line.prototype.distance = function(point) {
+  var a = this.a
+  var b = this.b
+  var ln = b.sub(a).unit()
+  var x = ln.dot(point.sub(a))
+  if (x>=0 && x<b.sub(a).len()) {
+    var p = a.add(ln.scale(x))
+    return a.normal(b).dot(point.sub(p))
+  }
+}
+
+
+function createLines(points) {
+  var res = []
+  for (var i=0; i<points.length-2; i+=2) {
+    res.push(new Line(points.slice(i, i+2), 
+                      points.slice(i+2, i+4)))
+  }
+  res.push(new Line(points.slice(points.length-2, points.length),
+                    points.slice(0, 2)))
+  return res
 }

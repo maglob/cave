@@ -10,6 +10,7 @@ var gravity = [0, -0.02]
 var bullets = []
 var shipPoints = [20,0, -15,-12, -8,-3, -8,4, -15,12]
 var cavePoints = createRegularPolygon(6).scale([600, 300]).rotate(Math.PI/16).repeatNext(3).midpointDisplacement()
+var caveLines
 var isPause = false
 
 window.onkeydown = window.onkeyup = function (e) {
@@ -29,8 +30,16 @@ function set(elementIdDotAttribute, value) {
   return document.getElementById(a[0]).setAttribute(a[1], value)
 }
 
+function Bullet(pos, v) {
+  this.pos = pos.slice()
+  this.v = v.slice()
+  this.dom = document.getElementById("bullets").appendChild(
+    document.createElementNS("http://www.w3.org/2000/svg", "circle"))
+  this.dom.setAttribute("r", 1)
+}
 
 function init() {
+  caveLines = createLines(cavePoints)
   set('ship.points', shipPoints)
   set('cave.points', cavePoints)
   set('shield.r', 26)
@@ -47,18 +56,21 @@ function updateWorld() {
   if (ship.controls.thrust) 
     ship.v.add(createNormal(ship.a).scale(.5), ship.v)
   if (ship.controls.fire) 
-    bullets.push({
-      pos: ship.pos.add(0),
-      v: createNormal(ship.a).scale(10).add(ship.v)
-    })
+    bullets.push(new Bullet(ship.pos, createNormal(ship.a).scale(10).add(ship.v)));
   ship.v.add(gravity, ship.v)
   ship.pos.add(ship.v, ship.pos)
   for(var i=0; i<bullets.length; i++) {
     var b = bullets[i]
     b.pos.add(b.v, b.pos)
-    for(var j=0; j<=cavePoints.length-4; j+=2) {
+    /* for(var j=0; j<=cavePoints.length-4; j+=2) {
       var l = cavePoints.slice(j, j+4)
       var d = b.pos.distance(l)
+      if(d && d<0 && d>-20) 
+        b.collision = true
+    } */
+    for(var j=0; j<caveLines.length; j++) {
+      var l = caveLines[j]
+      var d = l.distance(b.pos)
       if(d && d<0 && d>-20) 
         b.collision = true
     }
@@ -74,12 +86,6 @@ function updateWorld() {
 function renderView() {
   for(var i=0; i<bullets.length; i++) {
     var b = bullets[i]
-    if (!b.dom) {
-      b.dom = document.getElementById("bullets").appendChild(
-        document.createElementNS("http://www.w3.org/2000/svg", "circle"))
-      b.dom.setAttribute("r", 1)
-      b.dom.setAttribute("stroke", "white")
-    }
     b.dom.setAttribute("cx", b.pos[0])
     b.dom.setAttribute("cy", b.pos[1])
   }
