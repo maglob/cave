@@ -9,7 +9,7 @@ var ship = {
 var gravity = [0, -0.02]
 var bullets = []
 var shipPoints = [20,0, -15,-12, -8,-3, -8,4, -15,12]
-var cavePoints = createRegularPolygon(6).scale([600, 300]).rotate(Math.PI/16).repeatNext(3).midpointDisplacement()
+var cavePoints = createRegularPolygon(6).scale([1000, 500]).rotate(Math.PI/16).repeatNext(3).midpointDisplacement()
 var caveLines
 var isPause = false
 

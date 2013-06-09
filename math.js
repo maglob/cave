@@ -59,9 +59,9 @@ Array.prototype.normal = function(b) {
 Array.prototype.midpointDisplacement = function() {
   if (this.length >= 4) {
     var r = []
-    for(i=0; i<=this.length-4; i+=2) {
+    for(i=0; i<this.length; i+=2) {
       var a = this.slice(i, i+2)
-      var b = this.slice(i+2, i+4)
+      var b = i<this.length-2 ? this.slice(i+2, i+4) : this.slice(0, 2)
       r.push(a[0], a[1])
       var n = a.normal(b)   
       var mp = a.add(b).scale(0.5)
@@ -69,7 +69,6 @@ Array.prototype.midpointDisplacement = function() {
       var t = mp.add(n.scale(len-Math.random()*len*2))
       r.push(t[0], t[1])
     }
-    r.push(this[i], this[i+1])
     return r
   }
 }
