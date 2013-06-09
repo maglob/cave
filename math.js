@@ -115,13 +115,10 @@ function Line(a, b) {
 }
 
 Line.prototype.distance = function(point) {
-  var a = this.a
-  var b = this.b
-  var ln = b.sub(a).unit()
-  var x = ln.dot(point.sub(a))
-  if (x>=0 && x<b.sub(a).len()) {
-    var p = a.add(ln.scale(x))
-    return a.normal(b).dot(point.sub(p))
+  var x = this.unit.dot(point.sub(this.a))
+  if (x>=0 && x<=this.length) {
+    var p = this.a.add(this.unit.scale(x))
+    return this.normal.dot(point.sub(p))
   }
 }
 
