@@ -7,9 +7,17 @@
 <body style="background-color: #1f661c" onLoad="init()">
 <div id="view">
   <svg id="svg" width="99%" height="99%">
+  <defs>
+    <radialGradient id="thrustGradient">
+      <stop offset="0%" stop-color="white"/>
+      <stop offset="70%" stop-color="cyan"/>
+      <stop offset="100%" stop-color="black"/>
+    </radialGradient>
+  </defs>
     <g id="viewport">
       <polygon id="cave" fill="black" stroke="white"/>
       <g id="bullets" stroke="white"/>
+      <circle r="15" id="thrust" fill="url(#thrustGradient)"/>
       <polygon id="ship" stroke="white" fill="darkblue"/>
       <circle id="shield" fill-opacity="0" stroke="white"  stroke-dasharray="4 6"/> 
     </g>

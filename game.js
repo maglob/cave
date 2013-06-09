@@ -88,11 +88,17 @@ function renderView() {
   set('shield.visibility', ship.controls.shield ? 'visible' : 'hidden')
   if (ship.controls.shield) {
     var p = ship.pos
-    //p = cavePoints.slice(2,4).normal(cavePoints.slice(4,6)).scale(frame%25*4).add(cavePoints.slice(2,4))
     set('shield.transform', 'translate('+ p[0] +','+ p[1] +')')
     set('shield.stroke-dashoffset', frame*2)
   }
-  
+  if(ship.controls.thrust) {
+    var p = ship.pos.add(createNormal(ship.a - 180).scale(10))
+    set('thrust.r', 6 + frame%6)
+    set('thrust.cx', p[0])
+    set('thrust.cy', p[1])
+    set('thrust.visibility', 'visible')
+  } else 
+    set('thrust.visibility','hidden')
   document.getElementById("msg").firstChild.data = "Frame: " + frame +" Bullets: "+ bullets.length
 }
 
