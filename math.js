@@ -137,6 +137,10 @@ Line.prototype.distance = function(point) {
   }
 }
 
+Line.prototype.toString = function() {
+  return "{"+ this.a + ", "+ this.b +", "+ this.v +", "+ this.unit + ", "+ this.length +", "+ this.midpoint +"}"
+}
+
 
 function createLines(points) {
   var res = []

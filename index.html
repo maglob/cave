@@ -4,7 +4,7 @@
 <script src="math.js"></script>
 <script src="game.js"></script>
 </head>
-<body style="background-color: #1f661c" onLoad="init()">
+<body style="background-color: #1f661c; margin: 0; padding: 0" onLoad="init()">
 <div id="view">
   <svg id="svg" width="99%" height="99%">
   <defs>
@@ -19,13 +19,15 @@
       <g id="bullets" stroke="white"/>
       <circle r="15" id="thrust" fill="url(#thrustGradient)"/>
       <polygon id="ship" stroke="white" fill="darkblue"/>
-      <circle id="shield" fill-opacity="0" stroke="white"  stroke-dasharray="4 6"/> 
+      <circle id="shield" fill-opacity="0" stroke="white" stroke-dasharray="4 6"/>
+      <g id="debug"/>
     </g>
     <g id="console" fill="black">
       <text x="10" y="15" stroke="lightgray">A: turn left,  D: turn right,
       Shfit: thrust, Space: shield, Enter: fire, P: pause</text>
       <text id="msg" x="10" y="400" id="msg" stroke="white">Console</text>
     </g>
+    
   </svg>
 </div>
 </body>

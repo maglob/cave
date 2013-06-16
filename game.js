@@ -21,6 +21,11 @@ var grid = new Grid(cavePoints.even().min(), cavePoints.odd().min(),
                       })
                     })
 
+window.onclick = function(e) {
+  var x = e.clientX - view.clientWidth/2 + ship.pos[0]
+  var y = -1*(e.clientY - view.clientHeight/2) + ship.pos[1]
+}
+
 window.onkeydown = window.onkeyup = function (e) {
   var isDown = e.type == "keydown"
   switch(e.keyCode) {
@@ -59,14 +64,24 @@ Grid.prototype.getCell = function (x, y) {
     var id = this.getId(x,y)
     var r = this.cells[id]
     if (!r) {
-      r = this.fnInitCell(this.minX + id % this.cellsPerRow * this.cellSize,
-                          this.minY + id / this.cellsPerRow * this.cellSize,
+      r = this.fnInitCell(Math.floor((x-this.minX) / this.cellSize) * this.cellSize + this.minX,
+                          Math.floor((y-this.minY) / this.cellSize) * this.cellSize + this.minY,
                           this.cellSize)
       this.cells[id] = r
     }
     return r
   }
 }
+
+Grid.prototype.getRect = function(x,y) {
+  return {
+    x: Math.floor((x-this.minX) / this.cellSize) * this.cellSize + this.minX,
+    y: Math.floor((y-this.minY) / this.cellSize) * this.cellSize + this.minY,
+    width: this.cellSize,
+    height: this.cellSize
+  }
+}
+
 
 
 function Bullet(pos, v) {
@@ -115,6 +130,7 @@ function updateWorld() {
       bullets.splice(i--, 1)
     }
       
+
 }
 
 function renderView() {
