@@ -4,7 +4,7 @@
 <script src="math.js"></script>
 <script src="game.js"></script>
 </head>
-<body style="background-color: #1f661c; margin: 0; padding: 0" onLoad="init()">
+<body style="background-image: url('cave-bg.jpg'); margin: 0; padding: 0" onLoad="init()">
 <div id="view">
   <svg id="svg" width="99%" height="99%">
   <defs>
@@ -14,8 +14,8 @@
       <stop offset="100%" stop-color="black"/>
     </radialGradient>
   </defs>
-    <g id="viewport">
-      <polygon id="cave" fill="black" stroke="white"/>
+    <g id="viewport" style="">
+      <polygon id="cave" fill="black" stroke="gray"/>
       <g id="bullets" stroke="white"/>
       <circle r="15" id="thrust" fill="url(#thrustGradient)"/>
       <polygon id="ship" stroke="white" fill="darkblue"/>

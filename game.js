@@ -158,6 +158,7 @@ function renderView() {
   } else 
     set('thrust.visibility','hidden')
   document.getElementById("msg").firstChild.data = "Frame: " + frame +" Bullets: "+ bullets.length
+  document.body.style.backgroundPosition = ""+(1024-(ship.pos[0]%1024)) +" "+ (ship.pos[1]%1024);
 }
 
 function tick() {
