@@ -53,7 +53,7 @@ function Grid(minCorner, maxCorner, cellSize, fnInitCell) {
 }
 
 Grid.prototype.toGridCoord = function (p) {
-  return p.sub(this.minCorner).map(Math.floor).div(this.cellSize)
+  return p.sub(this.minCorner).div(this.cellSize).map(Math.floor)
 }
 
 Grid.prototype.getCellId = function (p) {
