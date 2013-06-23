@@ -12,12 +12,12 @@ var shipPoints = [20,0, -15,-12, -8,-3, -8,4, -15,12]
 var cavePoints = createRegularPolygon(6).scale([1000, 500]).rotate(Math.PI/16).repeatNext(3).midpointDisplacement()
 var caveLines = createLines(cavePoints)
 var isPause = false
-var grid = new Grid(cavePoints.even().min(), cavePoints.odd().min(), 
-                    cavePoints.even().max(), cavePoints.odd().max(),
+var grid = new Grid([cavePoints.even().min(), cavePoints.odd().min()], 
+                    [cavePoints.even().max(), cavePoints.odd().max()],
                     64,
-                    function (x, y, size) {
+                    function (p, size) {
                       return caveLines.filter(function(line) { 
-                        return line.midpoint.sub([x+size/2, y+size/2]).len() < line.length/2 + size/2*Math.SQRT2
+                        return line.midpoint.sub(p.add(size/2)).len() < line.length/2 + size/2*Math.SQRT2
                       })
                     })
 
@@ -43,46 +43,32 @@ function set(elementIdDotAttribute, value) {
   return document.getElementById(a[0]).setAttribute(a[1], value)
 }
 
-function Grid(minX, minY, maxX, maxY, cellSize, fnInitCell) {
+function Grid(minCorner, maxCorner, cellSize, fnInitCell) {
   this.cells = []
   this.cellSize = cellSize
-  this.cellsPerRow = Math.ceil((maxX-minX) / cellSize)
-  this.minX = minX
-  this.minY = minY
-  this.maxX = maxX
-  this.maxY = maxY
+  this.cellsPerRow = Math.ceil((maxCorner[0]-minCorner[0]) / cellSize)
+  this.minCorner = minCorner
+  this.maxCorner = maxCorner
   this.fnInitCell = fnInitCell ? fnInitCell : function() { return [] }
 }
 
-Grid.prototype.getId = function (x, y) {
-  return Math.floor((y-this.minY)/this.cellSize) * this.cellsPerRow + 
-    Math.floor((x-this.minX) / this.cellSize)
+Grid.prototype.toGridCoord = function (p) {
+  return p.sub(this.minCorner).map(Math.floor).div(this.cellSize)
 }
 
-Grid.prototype.getCell = function (x, y) {
-  if (x>=this.minX && x<=this.maxX && y>=this.minY && y<=this.maxY) {
-    var id = this.getId(x,y)
+Grid.prototype.getCellId = function (p) {
+  return this.toGridCoord(p).dot([1, this.cellsPerRow])
+}
+
+Grid.prototype.getCell = function (p) {
+  if (insideRect(p, this.minCorner, this.maxCorner)) {
+    var id = this.getCellId(p)
     var r = this.cells[id]
-    if (!r) {
-      r = this.fnInitCell(Math.floor((x-this.minX) / this.cellSize) * this.cellSize + this.minX,
-                          Math.floor((y-this.minY) / this.cellSize) * this.cellSize + this.minY,
-                          this.cellSize)
-      this.cells[id] = r
-    }
+    if (!r) 
+      r = this.cells[id] = this.fnInitCell(this.toGridCoord(p).scale(this.cellSize).add(this.minCorner), this.cellSize)
     return r
   }
 }
-
-Grid.prototype.getRect = function(x,y) {
-  return {
-    x: Math.floor((x-this.minX) / this.cellSize) * this.cellSize + this.minX,
-    y: Math.floor((y-this.minY) / this.cellSize) * this.cellSize + this.minY,
-    width: this.cellSize,
-    height: this.cellSize
-  }
-}
-
-
 
 function Bullet(pos, v) {
   this.pos = pos.slice()
@@ -115,7 +101,7 @@ function updateWorld() {
   for(var i=0; i<bullets.length; i++) {
     var b = bullets[i]
     b.pos.add(b.v, b.pos)
-    var lines = grid.getCell(b.pos[0], b.pos[1])
+    var lines = grid.getCell(b.pos)
     if (lines)
       for(var j=0; j<lines.length; j++) {
         var d = lines[j].distance(b.pos)

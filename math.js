@@ -12,6 +12,10 @@ Array.prototype.scale = function(scale, result) {
   }
 }
 
+Array.prototype.div = function(divisor, result) {
+  return this.scale(1.0/divisor, result)
+}
+
 Array.prototype.add = function(b, result) {
   if (typeof b == 'number')
     b = [b]
@@ -151,4 +155,8 @@ function createLines(points) {
   res.push(new Line(points.slice(points.length-2, points.length),
                     points.slice(0, 2)))
   return res
+}
+
+function insideRect(p, minCorner, maxCorner) {
+  return p[0]>=minCorner[0] && p[0]<maxCorner[0] && p[1]>=minCorner[1] && p[1]<maxCorner[1]
 }
