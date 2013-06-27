@@ -103,10 +103,8 @@ function updateWorld() {
     b.pos.add(b.v, b.pos)
     var lines = grid.getCell(b.pos)
     if (lines)
-      for(var j=0; j<lines.length; j++) {
-        var d = lines[j].distance(b.pos)
-        b.collision |= d && d<0 && d>-20
-      }
+      for(var j=0; j<lines.length; j++) 
+        b.collision |= lines[j].intersects(b.pos.sub(b.v), b.pos)
     else
       b.collision = true
   }
@@ -115,8 +113,16 @@ function updateWorld() {
       bullets[i].dom.parentNode.removeChild(bullets[i].dom)
       bullets.splice(i--, 1)
     }
-      
-
+  ship.controls.shield = false
+  var lines = grid.getCell(ship.pos)
+  if (lines) {
+    for(var i=0; i<lines.length; i++) {
+      var l = lines[i]
+      var rotPoints = shipPoints.rotate(ship.a/180*Math.PI).add(ship.pos)
+      for(var j=0; j<rotPoints.length-2; j+=2) 
+        ship.controls.shield |= l.intersects(rotPoints.slice(j,j+2), rotPoints.slice(j+2,j+4))
+    }
+  }
 }
 
 function renderView() {
@@ -125,7 +131,6 @@ function renderView() {
     b.dom.setAttribute("cx", b.pos[0])
     b.dom.setAttribute("cy", b.pos[1])
   }
-
   var view = document.getElementById("view")
   set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.pos[0]) +','+  (-view.clientHeight/2-ship.pos[1]) +')')
   set('ship.transform', 'translate('+ ship.pos[0] +','+ ship.pos[1] +') rotate('+ ship.a +')')
@@ -135,14 +140,13 @@ function renderView() {
     set('shield.transform', 'translate('+ p[0] +','+ p[1] +')')
     set('shield.stroke-dashoffset', frame*2)
   }
+  set('thrust.visibility', ship.controls.thrust ? 'visible' : 'hidden')
   if(ship.controls.thrust) {
     var p = ship.pos.add(createNormal(ship.a - 180).scale(10))
     set('thrust.r', 6 + frame%6)
     set('thrust.cx', p[0])
     set('thrust.cy', p[1])
-    set('thrust.visibility', 'visible')
-  } else 
-    set('thrust.visibility','hidden')
+  }
   document.getElementById("msg").firstChild.data = "Frame: " + frame +" Bullets: "+ bullets.length
   document.body.style.backgroundPosition = ""+(1024-(ship.pos[0]%1024)) +" "+ (ship.pos[1]%1024);
 }

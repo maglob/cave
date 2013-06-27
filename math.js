@@ -135,16 +135,24 @@ function Line(a, b) {
 
 Line.prototype.distance = function(point) {
   var x = this.unit.dot(point.sub(this.a))
-  if (x>=0 && x<=this.length) {
-    var p = this.a.add(this.unit.scale(x))
-    return this.normal.dot(point.sub(p))
-  }
+  var p = this.a.add(this.unit.scale(x))
+  return this.normal.dot(point.sub(p)) 
+}
+
+Line.prototype.intersects = function(pa, pb) {
+  if (this.distance(pa) * this.distance(pb) < 0) {
+    var xa = this.unit.dot(pa.sub(this.a))
+    var xb = this.unit.dot(pb.sub(this.a))
+    var x1 = Math.min(xa, xb)
+    var x2 = Math.max(xa, xb)
+    return x1<this.length && x2>=0
+  } else
+    return false
 }
 
 Line.prototype.toString = function() {
   return "{"+ this.a + ", "+ this.b +", "+ this.v +", "+ this.unit + ", "+ this.length +", "+ this.midpoint +"}"
 }
-
 
 function createLines(points) {
   var res = []
