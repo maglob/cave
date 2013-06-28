@@ -71,11 +71,12 @@ Grid.prototype.getCell = function (p) {
 }
 
 function Bullet(pos, v) {
-  this.pos = pos.slice()
-  this.v = v.slice()
+  this.pos = pos.clone()
+  this.v = v.clone()
   this.dom = document.getElementById("bullets").appendChild(
-    document.createElementNS("http://www.w3.org/2000/svg", "circle"))
-  this.dom.setAttribute("r", 1)
+    document.createElementNS("http://www.w3.org/2000/svg", "rect"))
+  this.dom.setAttribute("width", 2)
+  this.dom.setAttribute("height", 2)
 }
 
 function init() {
@@ -119,8 +120,8 @@ function updateWorld() {
     for(var i=0; i<lines.length; i++) {
       var l = lines[i]
       var rotPoints = shipPoints.rotate(ship.a/180*Math.PI).add(ship.pos)
-      for(var j=0; j<rotPoints.length-2; j+=2) 
-        ship.controls.shield |= l.intersects(rotPoints.slice(j,j+2), rotPoints.slice(j+2,j+4))
+      for(var j=0; j<rotPoints.length/2; j++) 
+        ship.controls.shield |= l.intersects(rotPoints.point(j), rotPoints.point(j+1))
     }
   }
 }
@@ -128,8 +129,8 @@ function updateWorld() {
 function renderView() {
   for(var i=0; i<bullets.length; i++) {
     var b = bullets[i]
-    b.dom.setAttribute("cx", b.pos[0])
-    b.dom.setAttribute("cy", b.pos[1])
+    b.dom.setAttribute("x", b.pos[0])
+    b.dom.setAttribute("y", b.pos[1])
   }
   var view = document.getElementById("view")
   set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.pos[0]) +','+  (-view.clientHeight/2-ship.pos[1]) +')')

@@ -64,10 +64,9 @@ Array.prototype.normal = function(b) {
 
 Array.prototype.midpointDisplacement = function() {
   if (this.length >= 4) {
-    var r = []
-    for(i=0; i<this.length; i+=2) {
-      var a = this.slice(i, i+2)
-      var b = i<this.length-2 ? this.slice(i+2, i+4) : this.slice(0, 2)
+    for(var r=[],i=0; i<this.length/2; i++) {
+      var a = this.point(i)
+      var b = this.point((i+1) % (this.length/2))
       r.push(a[0], a[1])
       var n = a.normal(b)   
       var mp = a.add(b).scale(0.5)
@@ -113,6 +112,18 @@ Array.prototype.even = function() {
   return this.filter(function (v,k) {return k%2 == 0 })
 }
 
+Array.prototype.point = function(/* index0, index1, ... indexN */) {
+  for(var r=[],i=0; i<arguments.length; i++) {
+    var p = arguments[i]
+    r.push(this[p*2], this[p*2+1])
+  }
+  return r
+}
+
+Array.prototype.clone = function() {
+  return this.slice()
+}
+
 function createRegularPolygon(n) {
   for(var r=[],i=0; i<n; i++) {
     var a = Math.PI * 2 / n * i;
@@ -126,8 +137,8 @@ function createNormal(angle) {
 }
 
 function Line(a, b) {
-  this.a = a.slice()
-  this.b = b.slice()
+  this.a = a.clone()
+  this.b = b.clone()
   this.v = b.sub(a)
   this.unit = this.v.unit()
   this.normal = a.normal(b)
@@ -157,14 +168,10 @@ Line.prototype.toString = function() {
 }
 
 function createLines(points) {
-  var res = []
-  for (var i=0; i<points.length-2; i+=2) {
-    res.push(new Line(points.slice(i, i+2), 
-                      points.slice(i+2, i+4)))
-  }
-  res.push(new Line(points.slice(points.length-2, points.length),
-                    points.slice(0, 2)))
-  return res
+  for (var r=[],i=0; i<points.length/2; i++) 
+    r.push(new Line(points.point(i), points.point(i+1)))
+  r.push(new Line(points.point(points.length/2-1), points.point(0)))
+  return r
 }
 
 function insideRect(p, minCorner, maxCorner) {
