@@ -37,9 +37,11 @@ Array.prototype.sub = function(b, result) {
 }
 
 Array.prototype.rotate = function(angle) {
+  var cosa = Math.cos(angle)
+  var sina = Math.sin(angle)
   for (var r=[],i=0; i<this.length; i+=2) 
-    r.push(this[i]*Math.cos(angle) - this[i+1]*Math.sin(angle),
-	   (this[i]*Math.sin(angle) + this[i+1]*Math.cos(angle)))
+    r.push(this[i]*cosa - this[i+1]*sina,
+	   this[i]*sina + this[i+1]*cosa)
   return r
 }
 
