@@ -8,9 +8,13 @@ var ship = {
 }
 var gravity = [0, -0.02]
 var bullets = []
+var asteroids = []
 var shipPoints = [20,0, -15,-12, -8,-3, -8,4, -15,12]
 var cavePoints = createRegularPolygon(6).scale([1000, 500]).rotate(Math.PI/16).repeatNext(3).midpointDisplacement()
 var caveLines = createLines(cavePoints)
+var asteroidPoints = createRegularPolygon(6).scale(40).midpointDisplacement()
+var asteroidLines = createLines(asteroidPoints)
+var starPoints = [-100, 100, 0, 0, 200, 200]
 var isPause = false
 var grid = new Grid([cavePoints.even().min(), cavePoints.odd().min()], 
                     [cavePoints.even().max(), cavePoints.odd().max()],
@@ -79,12 +83,26 @@ function Bullet(pos, v) {
   this.dom.setAttribute("height", 2)
 }
 
+function Asteroid(pos, v, a, av) {
+  this.pos = pos.clone()
+  this.v = v.clone()
+  this.a = a
+  this.av = av
+  this.dom = document.getElementById("asteroids").appendChild(
+    document.createElementNS("http://www.w3.org/2000/svg", "polygon"))
+  this.dom.setAttribute("points", asteroidPoints)
+}
+
 function init() {
   set('ship.points', shipPoints)
   set('cave.points', cavePoints)
   set('shield.r', 26)
   set('msg.x', 10)
   set('msg.y', view.clientHeight-4)
+  for(var i=0; i<4; i++)
+    asteroids.push(new Asteroid(ship.pos.add([i*200,200]), 
+                                createNormal(Math.random()*360).scale(1+Math.random()*2),
+                                0, 10-Math.random()*20))
   tick()
 }
 
@@ -114,6 +132,11 @@ function updateWorld() {
       bullets[i].dom.parentNode.removeChild(bullets[i].dom)
       bullets.splice(i--, 1)
     }
+  for(var i=0; i<asteroids.length; i++) {
+    var a = asteroids[i]
+    a.pos.add(a.v, a.pos)
+    a.a += a.av
+  }
   ship.controls.shield = false
   var lines = grid.getCell(ship.pos)
   if (lines) {
@@ -131,6 +154,11 @@ function renderView() {
     var b = bullets[i]
     b.dom.setAttribute("x", b.pos[0])
     b.dom.setAttribute("y", b.pos[1])
+  }
+  for(var i=0; i<asteroids.length; i++) {
+    var a = asteroids[i]
+    console.log("a: "+ a.a)
+    a.dom.setAttribute("transform", "translate("+ a.pos[0] +","+ a.pos[1] +") rotate(" + a.a +")");
   }
   var view = document.getElementById("view")
   set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.pos[0]) +','+  (-view.clientHeight/2-ship.pos[1]) +')')
