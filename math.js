@@ -168,7 +168,7 @@ Line.prototype.toString = function() {
 }
 
 function createLines(points) {
-  for (var r=[],i=0; i<points.length/2; i++) 
+  for (var r=[],i=0; i<points.length/2-1; i++) 
     r.push(new Line(points.point(i), points.point(i+1)))
   r.push(new Line(points.point(points.length/2-1), points.point(0)))
   return r

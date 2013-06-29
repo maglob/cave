@@ -99,10 +99,10 @@ function init() {
   set('shield.r', 26)
   set('msg.x', 10)
   set('msg.y', view.clientHeight-4)
-  for(var i=0; i<4; i++)
-    asteroids.push(new Asteroid(ship.pos.add([i*200,200]), 
-                                createNormal(Math.random()*360).scale(1+Math.random()*2),
-                                0, 10-Math.random()*20))
+  for(var i=0; i<8; i++)
+    asteroids.push(new Asteroid(ship.pos.add([-400+i*200,200]), 
+                                createNormal(Math.random()*360).scale(2+Math.random()*2),
+                                Math.random()*360, 20-Math.random()*40))
   tick()
 }
 
@@ -136,7 +136,24 @@ function updateWorld() {
     var a = asteroids[i]
     a.pos.add(a.v, a.pos)
     a.a += a.av
+    var lines = grid.getCell(a.pos)
+    if (lines)
+      for(var j=0; j<lines.length; j++) 
+        for(var k=0; k<asteroidLines.length; k++) {
+          var p1 = asteroidLines[k].a.rotate(a.a/180*Math.PI).add(a.pos)
+          var p2 = asteroidLines[k].b.rotate(a.a/180*Math.PI).add(a.pos)
+          var r = lines[j].intersects(p1, p2)
+          //console.log(lines[j].a +" - "+ lines[j].b +" :: "+ p1 +" - "+ p2 + " = "+ r)
+          a.collision |= r
+        }
+    else
+      a.collision = true
   }
+  for(var i=0; i<asteroids.length; i++) 
+    if(asteroids[i].collision) {
+      asteroids[i].dom.parentNode.removeChild(asteroids[i].dom)
+      asteroids.splice(i--, 1)
+    }
   ship.controls.shield = false
   var lines = grid.getCell(ship.pos)
   if (lines) {
@@ -157,7 +174,6 @@ function renderView() {
   }
   for(var i=0; i<asteroids.length; i++) {
     var a = asteroids[i]
-    console.log("a: "+ a.a)
     a.dom.setAttribute("transform", "translate("+ a.pos[0] +","+ a.pos[1] +") rotate(" + a.a +")");
   }
   var view = document.getElementById("view")
@@ -176,7 +192,7 @@ function renderView() {
     set('thrust.cx', p[0])
     set('thrust.cy', p[1])
   }
-  document.getElementById("msg").firstChild.data = "Frame: " + frame +" Bullets: "+ bullets.length
+  document.getElementById("msg").firstChild.data = "Frame: " + frame +" Bullets: "+ bullets.length +" Asteoids: "+ asteroids.length
   document.body.style.backgroundPosition = ""+(1024-(ship.pos[0]%1024)) +" "+ (ship.pos[1]%1024);
 }
 
