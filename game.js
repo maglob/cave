@@ -3,7 +3,7 @@ var frame = 0
 var ship = {
   pos: [0, 0], 
   v: [0, 0],
-  a: 90,  
+  a: Math.PI/2,  
   controls: {}
 }
 var gravity = [0, -0.02]
@@ -100,21 +100,21 @@ function init() {
   set('msg.x', 10)
   set('msg.y', view.clientHeight-4)
   for(var i=0; i<8; i++)
-    asteroids.push(new Asteroid(ship.pos.add([-400+i*200,200]), 
-                                createNormal(Math.random()*360).scale(2+Math.random()*2),
-                                Math.random()*360, 20-Math.random()*40))
+    asteroids.push(new Asteroid(ship.pos.add([-800+i*200,200]), 
+                                createUnit(Math.random()*Math.PI*2).scale(2+Math.random()*2),
+                                Math.random()*Math.PI*2, .5-Math.random()*1))
   tick()
 }
 
 function updateWorld() {
   if (ship.controls.left)
-    ship.a += 6
+    ship.a += .13
   if (ship.controls.right)
-    ship.a -= 6
+    ship.a -= .13
   if (ship.controls.thrust) 
-    ship.v.add(createNormal(ship.a).scale(.5), ship.v)
+    ship.v.add(createUnit(ship.a).scale(.5), ship.v)
   if (ship.controls.fire) 
-    bullets.push(new Bullet(ship.pos, createNormal(ship.a).scale(10).add(ship.v)));
+    bullets.push(new Bullet(ship.pos, createUnit(ship.a).scale(10).add(ship.v)));
   ship.v.add(gravity, ship.v)
   ship.pos.add(ship.v, ship.pos)
   for(var i=0; i<bullets.length; i++) {
@@ -140,11 +140,9 @@ function updateWorld() {
     if (lines)
       for(var j=0; j<lines.length; j++) 
         for(var k=0; k<asteroidLines.length; k++) {
-          var p1 = asteroidLines[k].a.rotate(a.a/180*Math.PI).add(a.pos)
-          var p2 = asteroidLines[k].b.rotate(a.a/180*Math.PI).add(a.pos)
-          var r = lines[j].intersects(p1, p2)
-          //console.log(lines[j].a +" - "+ lines[j].b +" :: "+ p1 +" - "+ p2 + " = "+ r)
-          a.collision |= r
+          var p1 = asteroidLines[k].a.rotate(a.a).add(a.pos)
+          var p2 = asteroidLines[k].b.rotate(a.a).add(a.pos)
+          a.collision |= lines[j].intersects(p1, p2)
         }
     else
       a.collision = true
@@ -159,7 +157,7 @@ function updateWorld() {
   if (lines) {
     for(var i=0; i<lines.length; i++) {
       var l = lines[i]
-      var rotPoints = shipPoints.rotate(ship.a/180*Math.PI).add(ship.pos)
+      var rotPoints = shipPoints.rotate(ship.a).add(ship.pos)
       for(var j=0; j<rotPoints.length/2; j++) 
         ship.controls.shield |= l.intersects(rotPoints.point(j), rotPoints.point(j+1))
     }
@@ -174,11 +172,11 @@ function renderView() {
   }
   for(var i=0; i<asteroids.length; i++) {
     var a = asteroids[i]
-    a.dom.setAttribute("transform", "translate("+ a.pos[0] +","+ a.pos[1] +") rotate(" + a.a +")");
+    a.dom.setAttribute("transform", "translate("+ a.pos[0] +","+ a.pos[1] +") rotate(" + (a.a/Math.PI*180) +")");
   }
   var view = document.getElementById("view")
   set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.pos[0]) +','+  (-view.clientHeight/2-ship.pos[1]) +')')
-  set('ship.transform', 'translate('+ ship.pos[0] +','+ ship.pos[1] +') rotate('+ ship.a +')')
+  set('ship.transform', 'translate('+ ship.pos[0] +','+ ship.pos[1] +') rotate('+ (ship.a/Math.PI*180) +')')
   set('shield.visibility', ship.controls.shield ? 'visible' : 'hidden')
   if (ship.controls.shield) {
     var p = ship.pos
@@ -187,7 +185,7 @@ function renderView() {
   }
   set('thrust.visibility', ship.controls.thrust ? 'visible' : 'hidden')
   if(ship.controls.thrust) {
-    var p = ship.pos.add(createNormal(ship.a - 180).scale(10))
+    var p = ship.pos.add(createUnit(ship.a - Math.PI).scale(10))
     set('thrust.r', 6 + frame%6)
     set('thrust.cx', p[0])
     set('thrust.cy', p[1])

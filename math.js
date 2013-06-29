@@ -132,8 +132,8 @@ function createRegularPolygon(n) {
   return r
 }
 
-function createNormal(angle) {
-  return [ Math.cos(Math.PI/180*angle), Math.sin(Math.PI/180*angle) ]
+function createUnit(angle) {
+  return [ Math.cos(angle), Math.sin(angle) ]
 }
 
 function Line(a, b) {
