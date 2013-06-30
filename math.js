@@ -163,6 +163,12 @@ Line.prototype.intersects = function(pa, pb) {
     return false
 }
 
+Line.prototype.intersectsPolygon = function(points) {
+  for(var i=0; i<points.length/2-1; i++) 
+    if(this.intersects(points.point(i), points.point(i+1)))
+      return true
+}
+
 Line.prototype.toString = function() {
   return "{"+ this.a + ", "+ this.b +", "+ this.v +", "+ this.unit + ", "+ this.length +", "+ this.midpoint +"}"
 }

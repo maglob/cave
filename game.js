@@ -135,31 +135,25 @@ function updateWorld() {
     bullets.push(new Bullet(ship.pos, createUnit(ship.a).scale(10).add(ship.v)));
   ship.v.add(gravity, ship.v)
   ship.pos.add(ship.v, ship.pos)
-  ship.controls.shield = false
-  var lines = grid.getCell(ship.pos)
-  for(var i=0; i<lines.length; i++) {
-    var l = lines[i]
-    var rotPoints = shipPoints.rotate(ship.a).add(ship.pos)
-    for(var j=0; j<rotPoints.length/2-1; j++) 
-      ship.controls.shield |= l.intersects(rotPoints.point(j), rotPoints.point(j+1))
-  }
+  var trPoints = shipPoints.rotate(ship.a).add(ship.pos)
+  ship.collision = grid.getCell(ship.pos).some(function (line) {
+    return line.intersectsPolygon(trPoints)
+  })
+  ship.controls.shield = ship.collision
 
   bullets.forEach(function (b) {
     b.pos.add(b.v, b.pos)
-    grid.getCell(b.pos).forEach(function (line) {
-      b.collision |= line.intersects(b.pos.sub(b.v), b.pos)
+    b.collision = grid.getCell(b.pos).some(function (line) {
+      return line.intersects(b.pos.sub(b.v), b.pos)
     })
   })
 
   asteroids.forEach(function (a) {
     a.pos.add(a.v, a.pos)
     a.a += a.av
-    grid.getCell(a.pos).forEach(function (line) {
-      for(var k=0; k<asteroidLines.length; k++) {
-        var p1 = asteroidLines[k].a.rotate(a.a).add(a.pos)
-        var p2 = asteroidLines[k].b.rotate(a.a).add(a.pos)
-        a.collision |= line.intersects(p1, p2)
-      }
+    var trPoints = asteroidPoints.rotate(a.a).add(a.pos)
+    a.collision = grid.getCell(a.pos).some(function (line) {
+      return line.intersectsPolygon(trPoints)
     })
   })
 
