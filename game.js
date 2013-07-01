@@ -9,6 +9,7 @@ var ship = {
 var gravity = [0, -0.02]
 var bullets = []
 var asteroids = []
+var sparks = []
 var shipPoints = [20,0, -15,-12, -8,-3, -8,4, -15,12]
 var cavePoints = createRegularPolygon(6).scale([1000, 500]).rotate(Math.PI/16).repeatNext(3).midpointDisplacement()
 var caveLines = createLines(cavePoints)
@@ -99,6 +100,15 @@ function Asteroid(pos, v, a, av) {
   this.dom.setAttribute("fill", "gray")
 }
 
+function Spark(pos, v, ttl) {
+  this.pos = pos.clone()
+  this.v = v.clone()
+  this.ttl = ttl
+  this.dom = spritesDom.appendChild(createSvgElement("circle"))
+  this.dom.setAttribute("r", 2)
+  this.dom.setAttribute("fill", "white")
+}
+
 function init() {
   spritesDom = document.getElementById("sprites")
   set('ship.points', shipPoints)
@@ -129,8 +139,13 @@ function updateWorld() {
     ship.a += .13
   if (ship.controls.right)
     ship.a -= .13
-  if (ship.controls.thrust) 
+  if (ship.controls.thrust) {
     ship.v.add(createUnit(ship.a).scale(.5), ship.v)
+    for(var i=0; i<4; i++)
+      sparks.push(new Spark(ship.pos.add(createUnit(ship.a).scale(-10)), 
+                            createUnit(ship.a+Math.PI-0.8+Math.random()*1.6).scale(7+Math.random()*4).add(ship.v),
+                            10+Math.random()*5))
+  }
   if (ship.controls.fire) 
     bullets.push(new Bullet(ship.pos, createUnit(ship.a).scale(10).add(ship.v)));
   ship.v.add(gravity, ship.v)
@@ -157,8 +172,17 @@ function updateWorld() {
     })
   })
 
+  sparks.forEach(function (b) {
+    b.v.scale(0.9, b.v)
+    b.pos.add(b.v, b.pos)
+    b.collision = --b.ttl<=0 || grid.getCell(b.pos).some(function (line) {
+      return line.intersects(b.pos.sub(b.v), b.pos)
+    })
+  })
+
   bullets = cleanupSprites(bullets)
   asteroids = cleanupSprites(asteroids)
+  sparks = cleanupSprites(sparks)
 }
 
 function renderView() {
@@ -170,6 +194,12 @@ function renderView() {
   for(var i=0; i<asteroids.length; i++) {
     var a = asteroids[i]
     a.dom.setAttribute("transform", "translate("+ a.pos[0] +","+ a.pos[1] +") rotate(" + (a.a/Math.PI*180) +")");
+  }
+  for(var i=0; i<sparks.length; i++) {
+    var b = sparks[i]
+    b.dom.setAttribute("cx", b.pos[0])
+    b.dom.setAttribute("cy", b.pos[1])
+    b.dom.setAttribute("fill", ["#222", "#666", "#999", "#ccc", "#eee"][Math.min(4,Math.floor(b.ttl/15*4))])
   }
   var view = document.getElementById("view")
   set('viewport.transform', 'scale(1,-1) translate('+ (view.clientWidth/2-ship.pos[0]) +','+  (-view.clientHeight/2-ship.pos[1]) +')')
@@ -187,7 +217,11 @@ function renderView() {
     set('thrust.cx', p[0])
     set('thrust.cy', p[1])
   }
-  document.getElementById("msg").firstChild.data = "Frame: " + frame +" Bullets: "+ bullets.length +" Asteoids: "+ asteroids.length
+  document.getElementById("msg").firstChild.data 
+    =" Frame: " + frame 
+    +" Bullets: "+ bullets.length 
+    +" Asteoids: "+ asteroids.length
+    +" Sparks: "+ sparks.length
   document.body.style.backgroundPosition = ""+(1024-(ship.pos[0]%1024)) +" "+ (ship.pos[1]%1024);
 }
 
